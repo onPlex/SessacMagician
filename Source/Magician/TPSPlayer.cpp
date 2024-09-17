@@ -90,6 +90,7 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(TurnIA, ETriggerEvent::Triggered, this, &ATPSPlayer::Turn);
 		EnhancedInputComponent->BindAction(JumpIA, ETriggerEvent::Started, this, &ATPSPlayer::InputJump);
 		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Triggered, this, &ATPSPlayer::InputFire);
+		EnhancedInputComponent->BindAction(InteractionIA, ETriggerEvent::Started, this, &ATPSPlayer::InteractionPositive);
 	}
 }
 
@@ -156,6 +157,38 @@ void ATPSPlayer::InputFire(const FInputActionValue& Value)
 
 		FireReady = false;
     }
+}
+
+void ATPSPlayer::InteractionPositive(const FInputActionValue& Value)
+{
+	FVector _Start = GetActorLocation();
+	FVector _End = GetActorLocation() + GetActorForwardVector() * 2000.f;
+	//FHitResult _HitOut;
+	TArray<FHitResult> HitResults;
+
+	FCollisionQueryParams _TraceParams;
+	//GetWorld()->LineTraceSingleByChannel(_HitOut, _Start, _End, ECC_Visibility,_TraceParams);
+	GetWorld()->LineTraceMultiByChannel(HitResults,_Start,_End,ECC_GameTraceChannel1,_TraceParams);
+	
+	//DrawDebugLine(GetWorld(),_Start,_End,FColor::Green,true, 10.f);
+	// 전체 라인을 그리기 위한 디버그 라인 (시각적으로 전체 트레이스 경로를 확인)
+	DrawDebugLine(GetWorld(), _Start, _End, FColor::Cyan, false, 10.f, 0, 1.f);
+
+	// 각 충돌 지점에 대한 디버그 라인
+	for (const FHitResult& Hit : HitResults)
+	{
+		// 충돌한 지점
+		FVector HitLocation = Hit.ImpactPoint;
+
+		// 시작 지점에서 충돌한 지점까지 디버그 라인 그리기
+		DrawDebugLine(GetWorld(), _Start, HitLocation, FColor::Red, true, 10.f, 0, 1.f);
+
+		// 충돌 지점에 디버그 스피어를 그려서 정확한 충돌 위치 시각화
+		DrawDebugSphere(GetWorld(), HitLocation, 10.f, 12, FColor::Blue, true, 10.f);
+        
+		// _Start를 업데이트하여 다음 라인을 시작 지점으로 설정
+		_Start = HitLocation;
+	}
 }
 
 void ATPSPlayer::SpawnBullet()
