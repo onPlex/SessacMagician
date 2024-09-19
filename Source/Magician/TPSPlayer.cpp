@@ -19,6 +19,7 @@ ATPSPlayer::ATPSPlayer()
 	//Skeletal Mesh Resource import
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> InitMesh(
 		TEXT("/Script/Engine.SkeletalMesh'/Game/MyResource/UnityChan/unitychan.unitychan'"));
+	
 
 	if (InitMesh.Succeeded()) //리소스가 제대로 확보되었으면 ( 접근 + 가져오기)
 	{
@@ -90,6 +91,7 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(TurnIA, ETriggerEvent::Triggered, this, &ATPSPlayer::Turn);
 		EnhancedInputComponent->BindAction(JumpIA, ETriggerEvent::Started, this, &ATPSPlayer::InputJump);
 		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Triggered, this, &ATPSPlayer::InputFire);
+		EnhancedInputComponent->BindAction(InteractionIA, ETriggerEvent::Started, this, &ATPSPlayer::InteractionPositive);
 	}
 }
 
@@ -156,6 +158,44 @@ void ATPSPlayer::InputFire(const FInputActionValue& Value)
 
 		FireReady = false;
     }
+}
+
+void ATPSPlayer::InteractionPositive(const FInputActionValue& Value)
+{
+	//시작점 
+    FVector _StartPoint  = GetActorLocation();
+	//끝점
+	FVector _EndPoint = _StartPoint + GetActorForwardVector() * 2000.f;
+	//Trace 결과 값 Struct
+	//FHitResult _HitOut;
+
+	//결과값을 Array 복수형태로 
+	TArray<FHitResult> _HitResults;
+
+	
+	FCollisionQueryParams _TraceParams;
+
+	//GetWorld()->LineTraceSingleByChannel(_HitOut,_StartPoint,_EndPoint,ECC_Visibility,_TraceParams);
+
+	GetWorld()->LineTraceMultiByChannel(_HitResults,_StartPoint,_EndPoint,ECC_GameTraceChannel1,_TraceParams);
+    //ECC_GameTraceChannel1 -> Collision Profile 셋팅에 직접 만든 첫번째 채널
+
+	//DrawDebugLine(GetWorld(),_StartPoint,_EndPoint, FColor::Green,true,10.f);
+
+	//_HitResults 반복문을 통해서 확인
+	for(FHitResult& Hit: _HitResults)
+	{
+		FVector HitLocation = Hit.ImpactPoint;
+		//FVector Debug 
+
+		//트레이스 쏜, 시작 지점에서 , 충돌한 지점까지 그린 debug 선 
+		DrawDebugLine(GetWorld(), _StartPoint,HitLocation,FColor::Red,true,10.f,0,5.f);
+
+		DrawDebugSphere(GetWorld(), HitLocation,10.f,12,FColor::Blue,true,5.f);
+
+		// 
+		_StartPoint = HitLocation;
+	}
 }
 
 void ATPSPlayer::SpawnBullet()
