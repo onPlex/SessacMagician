@@ -210,3 +210,26 @@ void ATPSPlayer::FireCoolTimer(float Duration, float deltatTime)
 		FireReady = true;
 	}
 }
+
+
+// ======================================
+// Player Item Section
+// ======================================
+void ATPSPlayer::AddItemToInventory(const FItemData& NewItem)
+{
+	Inventory.Add(NewItem);
+	UE_LOG(LogTemp, Warning, TEXT("Item added: %s"), *NewItem.ItemName.ToString());
+}
+
+void ATPSPlayer::RemoveItemFromInventory(int32 ItemID)
+{
+	for (int32 i = 0; i < Inventory.Num(); ++i)
+	{
+		if (Inventory[i].ItemID == ItemID)
+		{
+			Inventory.RemoveAt(i);
+			UE_LOG(LogTemp, Warning, TEXT("Item removed: %d"), ItemID);
+			return;
+		}
+	}
+}

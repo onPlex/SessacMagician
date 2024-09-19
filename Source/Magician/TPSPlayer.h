@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "ItemData.h"  // FItemData 구조체 포함
 #include "TPSPlayer.generated.h"
 
 
@@ -90,12 +91,22 @@ private:
 	float FireTimerTime;
 
 public:
-
 	UPROPERTY(EditAnywhere, Category = "Fire")
 	float FireCoolTime;
 
 protected:
 	void FireCoolTimer(float Duration, float deltatTime);
 
+public:
+	// 인벤토리: 아이템 데이터 배열
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	TArray<FItemData> Inventory;
 
+	// 인벤토리에 아이템 추가
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void AddItemToInventory(const FItemData& NewItem);
+
+	// 인벤토리에서 아이템 제거
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void RemoveItemFromInventory(int32 ItemID);
 };
