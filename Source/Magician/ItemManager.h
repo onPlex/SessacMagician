@@ -15,6 +15,7 @@ class MAGICIAN_API UItemManager : public UObject
 {
 	GENERATED_BODY()
 
+	/*
 	//아이템 데이터를 저장하는 맵 (ItemId -> FItemData)
 	TMap<int32, FItemData> ItemDataMap;
 
@@ -28,4 +29,5 @@ class MAGICIAN_API UItemManager : public UObject
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	FItemData& GetItemDataByID(int32 ItemID);
+	*/
 };
