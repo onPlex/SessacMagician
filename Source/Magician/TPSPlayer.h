@@ -79,6 +79,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = Fire)
 	TSubclassOf<class APBullet> magazine;
 
+private:
+	AActor* CachedInteractableActor; // 현재 상호작용 중인 액터를 저장 (캐싱 변수)
+	void PerformInteractionTrace();
 public:
 	void SpawnBullet();
 
@@ -95,8 +98,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Fire")
 	float FireCoolTime;
 
+	UFUNCTION()
+	void AddItemToInventory();
+
+	UFUNCTION()
+	void RemoeItemToInventory();
+	
 protected:
 	void FireCoolTimer(float Duration, float deltatTime);
 
+	
 
 };

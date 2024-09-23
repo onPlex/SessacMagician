@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "InteractableInterface.h"
 #include "PBullet.h"
 
 
@@ -19,7 +20,7 @@ ATPSPlayer::ATPSPlayer()
 	//Skeletal Mesh Resource import
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> InitMesh(
 		TEXT("/Script/Engine.SkeletalMesh'/Game/MyResource/UnityChan/unitychan.unitychan'"));
-	
+
 
 	if (InitMesh.Succeeded()) //리소스가 제대로 확보되었으면 ( 접근 + 가져오기)
 	{
@@ -66,6 +67,14 @@ void ATPSPlayer::BeginPlay()
 			Subsytem->AddMappingContext(PlayerMappingContext, 0);
 		}
 	}
+
+	//일정 주기마다 Trace 로 실행하는 타이머 설정 (0.2f)
+	FTimerHandle TraceTimerHandle;
+	GetWorldTimerManager().SetTimer
+	(TraceTimerHandle,
+	 this,
+	 &ATPSPlayer::PerformInteractionTrace,
+	 0.2f, true);
 }
 
 // Called every frame
@@ -91,7 +100,8 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(TurnIA, ETriggerEvent::Triggered, this, &ATPSPlayer::Turn);
 		EnhancedInputComponent->BindAction(JumpIA, ETriggerEvent::Started, this, &ATPSPlayer::InputJump);
 		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Triggered, this, &ATPSPlayer::InputFire);
-		EnhancedInputComponent->BindAction(InteractionIA, ETriggerEvent::Started, this, &ATPSPlayer::InteractionPositive);
+		EnhancedInputComponent->BindAction(InteractionIA, ETriggerEvent::Started, this,
+		                                   &ATPSPlayer::InteractionPositive);
 	}
 }
 
@@ -157,32 +167,54 @@ void ATPSPlayer::InputFire(const FInputActionValue& Value)
 		}
 
 		FireReady = false;
-    }
+	}
 }
 
 void ATPSPlayer::InteractionPositive(const FInputActionValue& Value)
 {
-	//시작점 
-    FVector _StartPoint  = GetActorLocation();
-	//끝점
-	FVector _EndPoint = _StartPoint + GetActorForwardVector() * 2000.f;
-	//Trace 결과 값 Struct
-	//FHitResult _HitOut;
+	//상호작용 수행 임시
+	if (CachedInteractableActor)
+	{
+		IInteractableInterface* InteratableActor
+			= Cast<IInteractableInterface>(CachedInteractableActor);
 
-	//결과값을 Array 복수형태로 
-	TArray<FHitResult> _HitResults;
+		InteratableActor->Interact();
+	}
 
-	
-	FCollisionQueryParams _TraceParams;
+	/*
+    // LineTrace 
+	if(GetWorld()->LineTraceSingleByChannel(_HitOut,_StartPoint,_EndPoint,ECC_GameTraceChannel2,_TraceParams))
+	{
+		//LineTrace 성공시, 디버그 메세지 출력
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Actor: %s"),
+			*_HitOut.GetActor()->GetName()));
+		//LineTrace 성공시, 디버그 메세지 출력
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Location: %s"),
+			*_HitOut.ImpactPoint.ToString()));
 
-	//GetWorld()->LineTraceSingleByChannel(_HitOut,_StartPoint,_EndPoint,ECC_Visibility,_TraceParams);
+       // 히트된 위치까지의 디버그 라인 그리기		
+		DrawDebugLine(GetWorld(), _StartPoint,_HitOut.ImpactPoint,FColor::Red,false,5.f,0,2.f);
 
-	GetWorld()->LineTraceMultiByChannel(_HitResults,_StartPoint,_EndPoint,ECC_GameTraceChannel1,_TraceParams);
-    //ECC_GameTraceChannel1 -> Collision Profile 셋팅에 직접 만든 첫번째 채널
+		//히트된 위치에 디버그 스피어 그리기 
+		DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint,10.f,12,FColor::Blue,false,5.f);
+	}
+	else
+	{
+		//LineTrace 실패 시, 디버그 메세지 출력
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("No HIT"));
+
+		// 히트된 위치까지의 디버그 라인 그리기		
+		DrawDebugLine(GetWorld(), _StartPoint,_EndPoint,FColor::Blue,false,5.f,0,2.f);
+	}
 
 	//DrawDebugLine(GetWorld(),_StartPoint,_EndPoint, FColor::Green,true,10.f);
 
+	
 	//_HitResults 반복문을 통해서 확인
+	//결과값을 Array 복수형태로 
+	//TArray<FHitResult> _HitResults;
+	//GetWorld()->LineTraceMultiByChannel(_HitResults,_StartPoint,_EndPoint,ECC_GameTraceChannel1,_TraceParams);
+	//ECC_GameTraceChannel1 -> Collision Profile 셋팅에 직접 만든 첫번째 채널
 	for(FHitResult& Hit: _HitResults)
 	{
 		FVector HitLocation = Hit.ImpactPoint;
@@ -195,6 +227,89 @@ void ATPSPlayer::InteractionPositive(const FInputActionValue& Value)
 
 		// 
 		_StartPoint = HitLocation;
+	}*/
+}
+
+void ATPSPlayer::PerformInteractionTrace()
+{
+	//시작점 
+	FVector _StartPoint = GetActorLocation();
+	//끝점
+	FVector _EndPoint = _StartPoint + GetActorForwardVector() * 2000.f;
+	//Trace 결과 값 Struct
+	FHitResult _HitOut;
+	FCollisionQueryParams _TraceParams;
+	_TraceParams.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(_HitOut, _StartPoint, _EndPoint, ECC_GameTraceChannel2,
+	                                                 _TraceParams);
+
+	//bHit -> Trace (구조체) 결과 값 있으면
+	if (bHit)
+	{
+		AActor* HitActor = _HitOut.GetActor();
+
+		if (HitActor)
+		{
+			//해당 액터에, 특정 인터페이스를 소유하고 있는지 여부를 알고 싶으면, Casting을 해보면됨
+			// Cast 성공하면 , 해당 인터페이스 소유   <-> 실패하면 , 없음
+			IInteractableInterface* InteractableActor = Cast<IInteractableInterface>(HitActor);
+			if (InteractableActor) // 해당액터가 인터렉션 가능 
+			{
+				//새로운 상호작용 대상이 이전 상호작용 대상과 다르면 
+				if (CachedInteractableActor != HitActor)
+				{
+					//이전 상호작용 대상이, 위젯을 Hide
+					if (CachedInteractableActor)
+					{
+						IInteractableInterface* CachedInteractable
+							= Cast<IInteractableInterface>(CachedInteractableActor);
+						if (CachedInteractable)
+						{
+							CachedInteractable->HideInteractionWidget();
+						}
+					}
+				}
+
+				//새로운 Hit액터를 캐시하고, 위젯 표시
+				CachedInteractableActor = HitActor;
+				InteractableActor->DiplayInteractionWidget();
+			}
+		}
+	}
+	else //No Hit
+	{
+		//과게어 상호작용한 대상이 있으면 
+		if (CachedInteractableActor)
+		{
+			IInteractableInterface* CachedInteractable = Cast<IInteractableInterface>(CachedInteractableActor);
+			if (CachedInteractable)
+			{
+				//위젯 끄기
+				CachedInteractable->HideInteractionWidget();
+			}
+			//상호작용하는 대상이 없으니 Null로 할당
+			CachedInteractableActor = nullptr;
+		}
+	}
+
+	//Debug 그리기
+	if (bHit)
+	{
+		// 히트된 위치까지의 디버그 라인 그리기		
+		DrawDebugLine(GetWorld(), _StartPoint, _HitOut.ImpactPoint, FColor::Red, false, 5.f, 0, 2.f);
+		//히트된 위치에 디버그 스피어 그리기 
+		DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint, 10.f, 12, FColor::Blue, false, 5.f);
+		//LineTrace 성공시, 디버그 메세지 출력
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Actor: %s"),
+			                                 *_HitOut.GetActor()->GetName()));
+	}
+	else
+	{
+		//LineTrace 실패 시, 디버그 메세지 출력
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("No HIT"));
+		// 히트된 위치까지의 디버그 라인 그리기		
+		DrawDebugLine(GetWorld(), _StartPoint, _EndPoint, FColor::Blue, false, 5.f, 0, 2.f);
 	}
 }
 
@@ -204,13 +319,22 @@ void ATPSPlayer::SpawnBullet()
 	GetWorld()->SpawnActor<APBullet>(magazine, _firePosition);
 }
 
+void ATPSPlayer::AddItemToInventory()
+{
+}
+
+void ATPSPlayer::RemoeItemToInventory()
+{
+}
+
+
 void ATPSPlayer::FireCoolTimer(float Duration, float deltatTime)
 {
-     // 장전중
+	// 장전중
 	if (FireTimerTime < Duration)
 	{
 		FireTimerTime += deltatTime;
-    }
+	}
 	else //재장전 
 	{
 		FireTimerTime = 0;
