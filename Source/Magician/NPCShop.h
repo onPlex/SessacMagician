@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ItemData.h"
+#include "NPC.h"
 #include "NPCShop.generated.h"
 
 UCLASS()
-class MAGICIAN_API ANPCShop : public AActor
+class MAGICIAN_API ANPCShop : public ANPC
 {
 	GENERATED_BODY()
 	
@@ -21,6 +22,11 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+
+	// 상점 아이템 판매 취급 목록
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Shop")
+	TArray<FName> ItemsOnSale;
+	
 	// 상점 아이템 리스트
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shop")
 	TMap<int32, FItemData> ItemsInStock;

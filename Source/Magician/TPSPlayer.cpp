@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "InteractableInterface.h"
 #include "PBullet.h"
 
 
@@ -55,6 +56,10 @@ ATPSPlayer::ATPSPlayer()
 void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 일정 주기로 Trace를 실행하는 타이머 설정 (1초마다 실행)
+	FTimerHandle TraceTimerHandle;
+	GetWorldTimerManager().SetTimer(TraceTimerHandle, this, &ATPSPlayer::PerformInteractionTrace, 0.2f, true);
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -161,33 +166,11 @@ void ATPSPlayer::InputFire(const FInputActionValue& Value)
 
 void ATPSPlayer::InteractionPositive(const FInputActionValue& Value)
 {
-	FVector _Start = GetActorLocation();
-	FVector _End = GetActorLocation() + GetActorForwardVector() * 2000.f;
-	//FHitResult _HitOut;
-	TArray<FHitResult> HitResults;
-
-	FCollisionQueryParams _TraceParams;
-	//GetWorld()->LineTraceSingleByChannel(_HitOut, _Start, _End, ECC_Visibility,_TraceParams);
-	GetWorld()->LineTraceMultiByChannel(HitResults,_Start,_End,ECC_GameTraceChannel1,_TraceParams);
-	
-	//DrawDebugLine(GetWorld(),_Start,_End,FColor::Green,true, 10.f);
-	// 전체 라인을 그리기 위한 디버그 라인 (시각적으로 전체 트레이스 경로를 확인)
-	DrawDebugLine(GetWorld(), _Start, _End, FColor::Cyan, false, 10.f, 0, 1.f);
-
-	// 각 충돌 지점에 대한 디버그 라인
-	for (const FHitResult& Hit : HitResults)
-	{
-		// 충돌한 지점
-		FVector HitLocation = Hit.ImpactPoint;
-
-		// 시작 지점에서 충돌한 지점까지 디버그 라인 그리기
-		DrawDebugLine(GetWorld(), _Start, HitLocation, FColor::Red, true, 10.f, 0, 1.f);
-
-		// 충돌 지점에 디버그 스피어를 그려서 정확한 충돌 위치 시각화
-		DrawDebugSphere(GetWorld(), HitLocation, 10.f, 12, FColor::Blue, true, 10.f);
-        
-		// _Start를 업데이트하여 다음 라인을 시작 지점으로 설정
-		_Start = HitLocation;
+	if(CachedInteractableActor)
+	{		
+		IInteractableInterface* InteractableActor = Cast<IInteractableInterface>(CachedInteractableActor);
+		// 상호작용 수행
+		InteractableActor->Interact();
 	}
 }
 
@@ -195,6 +178,76 @@ void ATPSPlayer::SpawnBullet()
 {
 	FTransform _firePosition = WeaponMeshComp->GetSocketTransform(TEXT("FirePosition"));
 	GetWorld()->SpawnActor<APBullet>(magazine, _firePosition);
+}
+
+void ATPSPlayer::PerformInteractionTrace()
+{
+	FVector _Start = GetActorLocation();
+	FVector _End = GetActorLocation() + GetActorForwardVector() * 2000.f;
+	FHitResult _HitOut;	
+
+	FCollisionQueryParams _TraceParams;
+	_TraceParams.AddIgnoredActor(this);
+
+	// LineTrace 실행
+	bool bHit = GetWorld()->LineTraceSingleByChannel(_HitOut, _Start, _End, ECC_GameTraceChannel1, _TraceParams);
+    
+	if (bHit)
+	{
+		AActor* HitActor = _HitOut.GetActor();
+        
+		// 상호작용 가능한 액터가 IInteractableInterface를 구현했는지 확인
+		if (HitActor)
+		{
+			IInteractableInterface* InteractableActor = Cast<IInteractableInterface>(HitActor);
+			if (InteractableActor)
+			{
+				// 새로운 상호작용 대상이 이전 상호작용 대상과 다르면
+				if (CachedInteractableActor != HitActor)
+				{
+					// 이전 상호작용 대상이 있었다면 위젯을 숨김
+					if (CachedInteractableActor)
+					{
+						IInteractableInterface* CachedInteractable = Cast<IInteractableInterface>(CachedInteractableActor);
+						if (CachedInteractable)
+						{
+							CachedInteractable->HideInteractionWidget();
+						}
+					}
+
+					// 새로운 액터를 캐시하고 위젯 표시
+					CachedInteractableActor = HitActor;
+					InteractableActor->DisplayInteractionWidget();
+				}
+			}
+		}
+	}
+	else
+	{
+		// 트레이스가 실패하면 캐시된 상호작용 대상이 있을 경우 위젯을 숨김
+		if (CachedInteractableActor)
+		{
+			IInteractableInterface* CachedInteractable = Cast<IInteractableInterface>(CachedInteractableActor);
+			if (CachedInteractable)
+			{
+				CachedInteractable->HideInteractionWidget();
+			}
+			CachedInteractableActor = nullptr;  // 상호작용 대상 초기화
+		}
+	}
+
+	// 디버그용 라인 및 메시지 (필요한 경우)
+	//if (bHit)
+	//{
+	//	DrawDebugLine(GetWorld(), _Start, _HitOut.ImpactPoint, FColor::Red, false, 1.f, 0, 2.f);
+	//	DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint, 10.f, 12, FColor::Yellow, false, 1.f);
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Actor: %s"), *_HitOut.GetActor()->GetName()));
+	//}
+	//else
+	//{
+	//	DrawDebugLine(GetWorld(), _Start, _End, FColor::Blue, false, 1.f, 0, 2.f);
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No Hit"));
+	//}
 }
 
 void ATPSPlayer::FireCoolTimer(float Duration, float deltatTime)

@@ -87,12 +87,15 @@ public:
 
 
 private:
+	void PerformInteractionTrace(); // 상호작용 확인 Trace 
+	AActor* CachedInteractableActor;// 현재 상호작용 중인 액터를 저장
+	
 	bool FireReady;
-	float FireTimerTime;
-
+	float FireTimerTime;	
 public:
 	UPROPERTY(EditAnywhere, Category = "Fire")
 	float FireCoolTime;
+	
 
 protected:
 	void FireCoolTimer(float Duration, float deltatTime);
