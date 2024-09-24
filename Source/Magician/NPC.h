@@ -41,6 +41,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	TSubclassOf<UUserWidget> InteractionWidgetClass;
 	
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	TSubclassOf<UUserWidget> ItemShopWidgetClass;
+	UPROPERTY()
+	class UUserWidget* ItemShopWidget;
+	
 public:
 	//상호작용 위젯을 표시하는 함수 (상호작용이 가능할때, )
 	virtual void DiplayInteractionWidget() override;
@@ -48,5 +53,7 @@ public:
 	virtual void HideInteractionWidget() override;
 	//상호작용이 실행될 때, 호출 되는 함수
 	virtual void Interact()override;
+	
+
 	
 };

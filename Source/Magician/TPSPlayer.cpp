@@ -294,23 +294,23 @@ void ATPSPlayer::PerformInteractionTrace()
 	}
 
 	//Debug 그리기
-	if (bHit)
-	{
-		// 히트된 위치까지의 디버그 라인 그리기		
-		DrawDebugLine(GetWorld(), _StartPoint, _HitOut.ImpactPoint, FColor::Red, false, 5.f, 0, 2.f);
-		//히트된 위치에 디버그 스피어 그리기 
-		DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint, 10.f, 12, FColor::Blue, false, 5.f);
-		//LineTrace 성공시, 디버그 메세지 출력
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Actor: %s"),
-			                                 *_HitOut.GetActor()->GetName()));
-	}
-	else
-	{
-		//LineTrace 실패 시, 디버그 메세지 출력
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("No HIT"));
-		// 히트된 위치까지의 디버그 라인 그리기		
-		DrawDebugLine(GetWorld(), _StartPoint, _EndPoint, FColor::Blue, false, 5.f, 0, 2.f);
-	}
+	//if (bHit)
+	//{
+	//	// 히트된 위치까지의 디버그 라인 그리기		
+	//	DrawDebugLine(GetWorld(), _StartPoint, _HitOut.ImpactPoint, FColor::Red, false, 5.f, 0, 2.f);
+	//	//히트된 위치에 디버그 스피어 그리기 
+	//	DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint, 10.f, 12, FColor::Blue, false, 5.f);
+	//	//LineTrace 성공시, 디버그 메세지 출력
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Actor: %s"),
+	//		                                 *_HitOut.GetActor()->GetName()));
+	//}
+	//else
+	//{
+	//	//LineTrace 실패 시, 디버그 메세지 출력
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("No HIT"));
+	//	// 히트된 위치까지의 디버그 라인 그리기		
+	//	DrawDebugLine(GetWorld(), _StartPoint, _EndPoint, FColor::Blue, false, 5.f, 0, 2.f);
+	//}
 }
 
 void ATPSPlayer::SpawnBullet()

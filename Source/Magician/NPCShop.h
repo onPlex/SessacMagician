@@ -14,4 +14,8 @@ class MAGICIAN_API ANPCShop : public ANPC
 {
 	GENERATED_BODY()
 	
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shop")
+	TArray<FName> ItemOnSale;
 };

@@ -82,4 +82,21 @@ void ANPC::Interact()
 	myPlayerController->SetShowMouseCursor(true);
 
 	HideInteractionWidget();
+	
+	if(ItemShopWidgetClass)
+	{
+	  ItemShopWidget = CreateWidget<UUserWidget>(GetWorld(),ItemShopWidgetClass);
+	  if(ItemShopWidget)ItemShopWidget->AddToViewport();
+	  
+	  FName PropertyName(TEXT("OwnerNPC"));
+	  FProperty* NPCProperty = ItemShopWidget->GetClass()->FindPropertyByName(PropertyName);
+	  if(NPCProperty)
+	  {
+	     FObjectProperty* ObjectProperty = CastField<FObjectProperty>(NPCProperty);
+	     if(ObjectProperty && ObjectProperty->PropertyClass == ANPC::StaticClass())
+	     {
+	         ObjectProperty->SetObjectPropertyValue_InContainer(ItemShopWidget,this);
+	     }     
+	  }
+	}
 }
