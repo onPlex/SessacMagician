@@ -20,7 +20,7 @@ void AItem::OnPickup(ATPSPlayer* Player)
 	if (Player)
 	{
 		// 인벤토리에 아이템 추가 로직
-		Player->AddItemToInventory(ItemData); 
+		//Player->AddItemToInventory(ItemData); 
 		Destroy();  // 습득 후 월드에서 삭제
 	}
 }
@@ -33,7 +33,7 @@ void AItem::OnDrop(ATPSPlayer* Player)
 		FVector DropLocation = Player->GetActorLocation() + Player->GetActorForwardVector() * 100.0f;
 		AItem* DroppedItem = GetWorld()->SpawnActor<AItem>(GetClass(), DropLocation, FRotator::ZeroRotator);
 		DroppedItem->ItemData = ItemData;
-		Player->RemoveItemFromInventory(ItemData.ItemID);
+		//Player->RemoveItemFromInventory(ItemData.ItemID);
 	}
 }
 

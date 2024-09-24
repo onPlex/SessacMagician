@@ -32,7 +32,18 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+protected:
+	
+	// 인벤토리 블루프린트 클래스를 참조하는 변수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	TSubclassOf<class UInventoryActorComponent> DefaultInventoryClass;
+	// 생성된 인벤토리 컴포넌트의 레퍼런스
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+	class UInventoryActorComponent* DefaultInventory;
+	// 인벤토리 초기화 함수
+	void InitializeInventoryComponent();
 
+	
 	//Spring Arm 컴포넌트 생성
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* SpringArmComp;
@@ -100,16 +111,17 @@ public:
 protected:
 	void FireCoolTimer(float Duration, float deltatTime);
 
+
 public:
-	// 인벤토리: 아이템 데이터 배열
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	TArray<FItemData> Inventory;
 
-	// 인벤토리에 아이템 추가
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddItemToInventory(const FItemData& NewItem);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Status")
+	int64 CurrentMoney = 9999;
 
-	// 인벤토리에서 아이템 제거
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void RemoveItemFromInventory(int32 ItemID);
+	UFUNCTION(BlueprintCallable)
+	void UpdateMoney(int64 inputVal);
+
+	//TArray<FItemData> Inventory;
+	//void AddItemToInventory(const FItemData& NewItem);
+	//void RemoveItemFromInventory(int32 ItemID);
+	
 };

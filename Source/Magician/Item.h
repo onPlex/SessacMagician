@@ -22,10 +22,11 @@ public:
 	// 아이템을 습득
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	void OnPickup(class ATPSPlayer* Player);
-
+	//void OnPickup(class UInventoryActorComponent* InventoryComponent);
 	// 아이템을 버림
 	UFUNCTION(BlueprintCallable, Category = "Item")
-	void OnDrop(class ATPSPlayer* Player);
+	void OnDrop(class ATPSPlayer* Player);	
+	//void OnDrop(class UInventoryActorComponent* InventoryComponent);
 
 	// 아이템 메쉬
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")

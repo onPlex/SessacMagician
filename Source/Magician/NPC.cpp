@@ -78,7 +78,6 @@ void ANPC::Interact()
 	if(ItemShopWidgetClass)
 	{
 		ItemShopWidget = CreateWidget<UUserWidget>(GetWorld(),ItemShopWidgetClass);
-		if(ItemShopWidget)ItemShopWidget->AddToViewport();
 		
 		// 블루프린트 변수 'OwnerNPC'에 접근
 		FName PropertyName(TEXT("OwnerNPC"));
@@ -92,5 +91,7 @@ void ANPC::Interact()
 				ObjectProperty->SetObjectPropertyValue_InContainer(ItemShopWidget, this);
 			}
 		}
+
+		if(ItemShopWidget)ItemShopWidget->AddToViewport();		
 	}
 }

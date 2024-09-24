@@ -22,13 +22,13 @@ void ANPCShop::BuyItem(ATPSPlayer* Player, int32 ItemID)
 	if (ItemsInStock.Contains(ItemID))
 	{
 		const FItemData& Item = ItemsInStock[ItemID];
-		Player->AddItemToInventory(Item);
+		//Player->AddItemToInventory(Item);
 		UE_LOG(LogTemp, Warning, TEXT("Item bought: %s"), *Item.ItemName.ToString());
 	}
 }
 
 void ANPCShop::SellItem(ATPSPlayer* Player, int32 ItemID)
 {
-	Player->RemoveItemFromInventory(ItemID);
+	//Player->RemoveItemFromInventory(ItemID);
 	UE_LOG(LogTemp, Warning, TEXT("Item sold: %d"), ItemID);
 }

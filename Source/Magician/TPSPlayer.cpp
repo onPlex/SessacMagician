@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "InteractableInterface.h"
 #include "PBullet.h"
+#include "InventoryActorComponent.h"
 
 
 // Sets default values
@@ -50,6 +51,8 @@ ATPSPlayer::ATPSPlayer()
 	FireCoolTime = 1.85f;
 	FireTimerTime = 0;
 	FireReady = true;
+
+	InitializeInventoryComponent();
 }
 
 // Called when the game starts or when spawned
@@ -97,6 +100,27 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Triggered, this, &ATPSPlayer::InputFire);
 		EnhancedInputComponent->BindAction(InteractionIA, ETriggerEvent::Started, this, &ATPSPlayer::InteractionPositive);
 	}
+}
+
+void ATPSPlayer::InitializeInventoryComponent()
+{
+	// DefaultInventoryClass가 설정되어 있는지 확인
+	if (DefaultInventoryClass)
+	{
+		// 블루프린트 기반의 인벤토리 컴포넌트를 생성
+		DefaultInventory = NewObject<UInventoryActorComponent>(this, DefaultInventoryClass);
+
+		// 생성된 컴포넌트를 액터에 추가
+		if (DefaultInventory)
+		{
+			DefaultInventory->RegisterComponent();
+			UE_LOG(LogTemp, Log, TEXT("Inventory component created successfully!"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to create Inventory component!"));
+		}
+	}	
 }
 
 void ATPSPlayer::Move(const FInputActionValue& Value)
@@ -264,7 +288,7 @@ void ATPSPlayer::FireCoolTimer(float Duration, float deltatTime)
 	}
 }
 
-
+/*
 // ======================================
 // Player Item Section
 // ======================================
@@ -276,13 +300,55 @@ void ATPSPlayer::AddItemToInventory(const FItemData& NewItem)
 
 void ATPSPlayer::RemoveItemFromInventory(int32 ItemID)
 {
+	// 인벤토리에서 아이템을 찾는다.
 	for (int32 i = 0; i < Inventory.Num(); ++i)
 	{
+		// 아이템 ID가 일치하는지 확인
 		if (Inventory[i].ItemID == ItemID)
 		{
-			Inventory.RemoveAt(i);
-			UE_LOG(LogTemp, Warning, TEXT("Item removed: %d"), ItemID);
+			// 스택 가능한 아이템인지 확인
+			if (Inventory[i].bIsStackable)
+			{
+				// 수량을 1 감소
+				Inventory[i].MaxStackCount -= 1;
+
+				// 수량이 0 이하가 되면 인벤토리에서 제거
+				if (Inventory[i].MaxStackCount <= 0)
+				{
+					Inventory.RemoveAt(i);
+					UE_LOG(LogTemp, Warning, TEXT("Item removed: %d"), ItemID);
+				}
+				else
+				{
+					// 수량이 0 이상이면 수량 감소를 로그로 남긴다.
+					UE_LOG(LogTemp, Warning, TEXT("Item quantity decreased: %d, Remaining: %d"), ItemID, Inventory[i].MaxStackCount);
+				}
+			}
+			else
+			{
+				// 스택 불가능한 아이템이면 바로 제거
+				Inventory.RemoveAt(i);
+				UE_LOG(LogTemp, Warning, TEXT("Non-stackable item removed: %d"), ItemID);
+			}
+
+			// 아이템을 처리한 후 함수를 종료
 			return;
 		}
+	}	// 아이템이 인벤토리에 없을 경우 로그 출력
+	UE_LOG(LogTemp, Warning, TEXT("Item not found in inventory: %d"), ItemID);
+}*/
+
+void ATPSPlayer::UpdateMoney(int64 inputVal)
+{
+	int64 _result;
+	_result = CurrentMoney + inputVal;
+
+	if(_result< 0 )
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f , FColor::Green, TEXT("Not Enough Money ! "));
+	}
+	else
+	{
+		CurrentMoney = _result;
 	}
 }
