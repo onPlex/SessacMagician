@@ -25,7 +25,7 @@ struct FInventoryItem
 };
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class MAGICIAN_API UInventoryActorComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -51,7 +51,7 @@ public:
 	void RemoveItemFromInventory(int32 ItemID,int32 Quantity);
 	//인벤토리에 가득 찼는지 확인
 	UFUNCTION(BlueprintCallable,Category="Inventory")
-	bool IsInventoryFill() const;
+	bool IsInventoryFull() const;
 	//인벤토리 최대 크기
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory")
 	int32 MaxInventorySize;
