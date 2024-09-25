@@ -34,15 +34,10 @@ public:
 
 protected:
 	
-	// 인벤토리 블루프린트 클래스를 참조하는 변수
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	TSubclassOf<class UInventoryActorComponent> DefaultInventoryClass;
 	// 생성된 인벤토리 컴포넌트의 레퍼런스
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	class UInventoryActorComponent* DefaultInventory;
-	// 인벤토리 초기화 함수
-	void InitializeInventoryComponent();
-
+	
 	
 	//Spring Arm 컴포넌트 생성
 	UPROPERTY(VisibleAnywhere, Category = Camera)

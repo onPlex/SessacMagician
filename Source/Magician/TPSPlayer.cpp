@@ -52,7 +52,8 @@ ATPSPlayer::ATPSPlayer()
 	FireTimerTime = 0;
 	FireReady = true;
 
-	InitializeInventoryComponent();
+	DefaultInventory = CreateDefaultSubobject<UInventoryActorComponent>(TEXT("DefaultInventory"));
+	DefaultInventory->MaxInventorySize = 30;
 }
 
 // Called when the game starts or when spawned
@@ -100,27 +101,6 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Triggered, this, &ATPSPlayer::InputFire);
 		EnhancedInputComponent->BindAction(InteractionIA, ETriggerEvent::Started, this, &ATPSPlayer::InteractionPositive);
 	}
-}
-
-void ATPSPlayer::InitializeInventoryComponent()
-{
-	// DefaultInventoryClass가 설정되어 있는지 확인
-	if (DefaultInventoryClass)
-	{
-		// 블루프린트 기반의 인벤토리 컴포넌트를 생성
-		DefaultInventory = NewObject<UInventoryActorComponent>(this, DefaultInventoryClass);
-
-		// 생성된 컴포넌트를 액터에 추가
-		if (DefaultInventory)
-		{
-			DefaultInventory->RegisterComponent();
-			UE_LOG(LogTemp, Log, TEXT("Inventory component created successfully!"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to create Inventory component!"));
-		}
-	}	
 }
 
 void ATPSPlayer::Move(const FInputActionValue& Value)
