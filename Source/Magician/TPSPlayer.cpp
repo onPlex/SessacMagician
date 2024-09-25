@@ -8,6 +8,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "InteractableInterface.h"
+#include "ItemData.h"
 #include "PBullet.h"
 
 
@@ -58,6 +59,14 @@ void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//일정 주기마다 Trace 로 실행하는 타이머 설정 (0.2f)
+	FTimerHandle TraceTimerHandle;
+	GetWorldTimerManager().SetTimer
+	(TraceTimerHandle,
+		this,
+		&ATPSPlayer::PerformInteractionTrace,
+		0.2f, true);
+
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsytem
@@ -68,13 +77,7 @@ void ATPSPlayer::BeginPlay()
 		}
 	}
 
-	//일정 주기마다 Trace 로 실행하는 타이머 설정 (0.2f)
-	FTimerHandle TraceTimerHandle;
-	GetWorldTimerManager().SetTimer
-	(TraceTimerHandle,
-	 this,
-	 &ATPSPlayer::PerformInteractionTrace,
-	 0.2f, true);
+	
 }
 
 // Called every frame
@@ -99,7 +102,7 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(LookUpIA, ETriggerEvent::Triggered, this, &ATPSPlayer::LookUp);
 		EnhancedInputComponent->BindAction(TurnIA, ETriggerEvent::Triggered, this, &ATPSPlayer::Turn);
 		EnhancedInputComponent->BindAction(JumpIA, ETriggerEvent::Started, this, &ATPSPlayer::InputJump);
-		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Triggered, this, &ATPSPlayer::InputFire);
+		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Started, this, &ATPSPlayer::InputFire);
 		EnhancedInputComponent->BindAction(InteractionIA, ETriggerEvent::Started, this,
 		                                   &ATPSPlayer::InteractionPositive);
 	}
@@ -318,16 +321,6 @@ void ATPSPlayer::SpawnBullet()
 	FTransform _firePosition = WeaponMeshComp->GetSocketTransform(TEXT("FirePosition"));
 	GetWorld()->SpawnActor<APBullet>(magazine, _firePosition);
 }
-
-void ATPSPlayer::AddItemToInventory()
-{
-}
-
-void ATPSPlayer::RemoeItemToInventory()
-{
-}
-
-
 void ATPSPlayer::FireCoolTimer(float Duration, float deltatTime)
 {
 	// 장전중
@@ -341,3 +334,56 @@ void ATPSPlayer::FireCoolTimer(float Duration, float deltatTime)
 		FireReady = true;
 	}
 }
+
+void ATPSPlayer::UpdateMoney(int64 inputVal)
+{
+	int64 _result;
+	_result = CurrentMoney + inputVal;
+
+	if(_result < 0 )
+	{
+		GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red,"Your money is less than zero");
+	}
+	else
+	{
+		CurrentMoney = _result;
+	}
+}
+/*
+void ATPSPlayer::AddItemToInventory(FItemData& item)
+{
+	Inventory.Add(item);
+}
+
+void ATPSPlayer::RemoveItemFromInventory(int32 ItemID)
+{
+	//인벤토리를 한바퀴 for 검색
+	for(int32 i = 0; i < Inventory.Num(); i++)
+	{
+		//아이템 ID가 맞는지 확인
+		if (Inventory[i].ItemId == ItemID)
+		{
+			// 스택가능한 아이템인지 확인
+			if(Inventory[i].bIsStackable)
+			{
+				// 수량을 - 1
+				Inventory[i].MaxStackCount -= 1;
+
+				if(Inventory[i].MaxStackCount <= 0)
+				{
+					Inventory.RemoveAt(i);
+				}
+				else
+				{
+					//예외처리 로그
+				}
+			}
+			else // 스태형이 아니면 바로삭제 
+			{
+				Inventory.RemoveAt(i);
+			}
+		
+			return;
+		}		
+	}
+}*/

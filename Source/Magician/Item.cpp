@@ -20,7 +20,7 @@ void AItem::OnPickUp(class ATPSPlayer* Player)
 	if (Player)
 	{
 		// 인벤토리에 아이템 추가 로직 (습득)
-		Player->AddItemToInventory();
+		//Player->AddItemToInventory();
 		//습득 후에 해당 (월드) 아이템은 삭제
 		Destroy();
 	}
@@ -38,6 +38,6 @@ void AItem::OnDrop(class ATPSPlayer* Player)
 		DroppedItem->ItemData = ItemData;
 
 		//플레이어 인벤토리에서 해당 아이템 삭제
-		Player->RemoeItemToInventory();
+		//Player->RemoeItemToInventory();
 	}
 }

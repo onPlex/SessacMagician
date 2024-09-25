@@ -98,15 +98,26 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Fire")
 	float FireCoolTime;
 
-	UFUNCTION()
-	void AddItemToInventory();
-
-	UFUNCTION()
-	void RemoeItemToInventory();
+	
 	
 protected:
 	void FireCoolTimer(float Duration, float deltatTime);
 
-	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
+	int64 CurrentMoney = 9999;
 
+	UFUNCTION(BlueprintCallable)
+	void UpdateMoney(int64 inputVal);
+/*
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
+	TArray<FItemData> Inventory;
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void AddItemToInventory(FItemData& item);
+	
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void RemoveItemFromInventory(int32 ItemID);*/
 };

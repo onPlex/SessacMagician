@@ -25,10 +25,10 @@ ANPC::ANPC()
 	InterationWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidgetComponent"));
 	InterationWidgetComponent->SetupAttachment(Skeletal);
 
-	InterationWidgetComponent->SetRelativeLocation(FVector(0,0,220.f));
-	InterationWidgetComponent->SetRelativeRotation(FRotator(90,0,90));
+	InterationWidgetComponent->SetRelativeLocation(FVector(0, 0, 220.f));
+	InterationWidgetComponent->SetRelativeRotation(FRotator(90, 0, 90));
 	InterationWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
-	InterationWidgetComponent->SetDrawSize(FVector2d(50,50));
+	InterationWidgetComponent->SetDrawSize(FVector2d(50, 50));
 
 	//if(InteractionWidgetClass)
 	//{
@@ -40,11 +40,12 @@ ANPC::ANPC()
 void ANPC::BeginPlay()
 {
 	Super::BeginPlay();
-	if(InteractionWidgetClass)
+	if (InteractionWidgetClass)
 	{
 		InterationWidgetComponent->SetWidgetClass(InteractionWidgetClass);
-		InterationWidgetComponent->SetVisibility(false);
 	}
+
+	InterationWidgetComponent->SetVisibility(false);
 }
 
 // Called every frame
@@ -55,7 +56,7 @@ void ANPC::Tick(float DeltaTime)
 
 void ANPC::DiplayInteractionWidget()
 {
-	if(InterationWidgetComponent)
+	if (InterationWidgetComponent)
 	{
 		InterationWidgetComponent->SetVisibility(true);
 	}
@@ -63,7 +64,7 @@ void ANPC::DiplayInteractionWidget()
 
 void ANPC::HideInteractionWidget()
 {
-	if(InterationWidgetComponent)
+	if (InterationWidgetComponent)
 	{
 		InterationWidgetComponent->SetVisibility(false);
 	}
@@ -75,28 +76,30 @@ void ANPC::Interact()
 
 	//TODO:상호작용 로직 추가
 
-	APlayerController* myPlayerController = UGameplayStatics::GetPlayerController(this,0);
+	APlayerController* myPlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
-	myPlayerController->SetViewTargetWithBlend(this,1.0f);
+	myPlayerController->SetViewTargetWithBlend(this, 1.0f);
 	myPlayerController->SetInputMode(FInputModeUIOnly());
 	myPlayerController->SetShowMouseCursor(true);
 
 	HideInteractionWidget();
-	
-	if(ItemShopWidgetClass)
+
+	if (ItemShopWidgetClass)
 	{
-	  ItemShopWidget = CreateWidget<UUserWidget>(GetWorld(),ItemShopWidgetClass);
-	  if(ItemShopWidget)ItemShopWidget->AddToViewport();
-	  
-	  FName PropertyName(TEXT("OwnerNPC"));
-	  FProperty* NPCProperty = ItemShopWidget->GetClass()->FindPropertyByName(PropertyName);
-	  if(NPCProperty)
-	  {
-	     FObjectProperty* ObjectProperty = CastField<FObjectProperty>(NPCProperty);
-	     if(ObjectProperty && ObjectProperty->PropertyClass == ANPC::StaticClass())
-	     {
-	         ObjectProperty->SetObjectPropertyValue_InContainer(ItemShopWidget,this);
-	     }     
-	  }
+		ItemShopWidget = CreateWidget<UUserWidget>(GetWorld(), ItemShopWidgetClass);
+
+
+		FName PropertyName(TEXT("OwnerNPC"));
+		FProperty* NPCProperty = ItemShopWidget->GetClass()->FindPropertyByName(PropertyName);
+		if (NPCProperty)
+		{
+			FObjectProperty* ObjectProperty = CastField<FObjectProperty>(NPCProperty);
+			if (ObjectProperty && ObjectProperty->PropertyClass == ANPC::StaticClass())
+			{
+				ObjectProperty->SetObjectPropertyValue_InContainer(ItemShopWidget, this);
+			}
+		}
+
+		if (ItemShopWidget)ItemShopWidget->AddToViewport();
 	}
 }
