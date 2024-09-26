@@ -20,8 +20,9 @@ struct FInventoryItem
 	int32 Quantity;
 
 	FInventoryItem() //기본 생성 수량 1개
-		:ItemData(), Quantity(1)
-	{}
+		: ItemData(), Quantity(1)
+	{
+	}
 };
 
 
@@ -35,22 +36,26 @@ public:
 	UInventoryActorComponent();
 
 	//아이템의 고유 ID를 키로 사용하는 인벤토리 맵
-	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="Inventory")
-	TMap<int32, FInventoryItem> Inventory;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory")
+	TMap<FName, FInventoryItem> Inventory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory")
+	UDataTable* ItemDataTable;
 
 	//DataTable로부터 아이템로드
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void LoadItemFromDataTable(UDataTable* ItemDataTable);
+	FItemData LoadItemFromDataTable(FName ItemRowName);
 
 	//인벤토리에 아이템 추가
-	UFUNCTION(BlueprintCallable,Category="Inventory")
-    void AddItemToInventory(int32 ItemID,int32 Quantity);
-	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void AddItemToInventory(FName ItemRowName, int32 Quantity);
+
 	//인벤토리에 아이템 제거
-	UFUNCTION(BlueprintCallable,Category="Inventory")
-	void RemoveItemFromInventory(int32 ItemID,int32 Quantity);
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void RemoveItemFromInventory(FName ItemRowName, int32 Quantity);
+	
 	//인벤토리에 가득 찼는지 확인
-	UFUNCTION(BlueprintCallable,Category="Inventory")
+	UFUNCTION(BlueprintCallable, Category="Inventory")
 	bool IsInventoryFull() const;
 	//인벤토리 최대 크기
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory")

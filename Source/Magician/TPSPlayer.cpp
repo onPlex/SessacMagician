@@ -10,6 +10,7 @@
 #include "InteractableInterface.h"
 #include "ItemData.h"
 #include "PBullet.h"
+#include "InventoryActorComponent.h"
 
 
 // Sets default values
@@ -52,6 +53,10 @@ ATPSPlayer::ATPSPlayer()
 	FireCoolTime = 1.85f;
 	FireTimerTime = 0;
 	FireReady = true;
+	
+		
+	DefaultInventory = CreateDefaultSubobject<UInventoryActorComponent>(TEXT("DefaultInventory"));
+	DefaultInventory->MaxInventorySize = 30;
 }
 
 // Called when the game starts or when spawned
@@ -314,6 +319,7 @@ void ATPSPlayer::PerformInteractionTrace()
 	//	// 히트된 위치까지의 디버그 라인 그리기		
 	//	DrawDebugLine(GetWorld(), _StartPoint, _EndPoint, FColor::Blue, false, 5.f, 0, 2.f);
 	//}
+
 }
 
 void ATPSPlayer::SpawnBullet()

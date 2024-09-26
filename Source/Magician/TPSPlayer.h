@@ -41,6 +41,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = EquipItems)
 	class UStaticMeshComponent* WeaponMeshComp;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = "Inventory")
+	class UInventoryActorComponent* DefaultInventory;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputMappingContext* PlayerMappingContext;
