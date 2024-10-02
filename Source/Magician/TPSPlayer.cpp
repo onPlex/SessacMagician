@@ -236,6 +236,7 @@ void ATPSPlayer::InteractionPositive(const FInputActionValue& Value)
 		// 
 		_StartPoint = HitLocation;
 	}*/
+
 }
 
 void ATPSPlayer::PerformInteractionTrace()
