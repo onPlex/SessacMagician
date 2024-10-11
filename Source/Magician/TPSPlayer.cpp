@@ -11,6 +11,9 @@
 #include "ItemData.h"
 #include "PBullet.h"
 #include "InventoryActorComponent.h"
+#include "InventoryWidget.h"
+#include "UIManager.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -82,7 +85,7 @@ void ATPSPlayer::BeginPlay()
 		}
 	}
 
-	
+	UIManagerRef= Cast<AUIManager>(UGameplayStatics::GetActorOfClass(GetWorld(),AUIManager::StaticClass()));	
 }
 
 // Called every frame
@@ -110,6 +113,8 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Started, this, &ATPSPlayer::InputFire);
 		EnhancedInputComponent->BindAction(InteractionIA, ETriggerEvent::Started, this,
 		                                   &ATPSPlayer::InteractionPositive);
+		EnhancedInputComponent->BindAction(InventoryIA, ETriggerEvent::Started, this,
+										   &ATPSPlayer::ToggleInventory);
 	}
 }
 
@@ -239,6 +244,7 @@ void ATPSPlayer::InteractionPositive(const FInputActionValue& Value)
 
 }
 
+
 void ATPSPlayer::PerformInteractionTrace()
 {
 	//시작점 
@@ -356,6 +362,33 @@ void ATPSPlayer::UpdateMoney(int64 inputVal)
 		CurrentMoney = _result;
 	}
 }
+
+
+void ATPSPlayer::ToggleInventory(const FInputActionValue& Value)
+{
+	if(UIManagerRef)
+	{
+		if(UIManagerRef->InventoryWidget)
+		{
+			UIManagerRef->InventoryWidget->ToggleInventory();
+		}
+	}
+	
+}
+void ATPSPlayer::HandleInventoryToggled(bool bIsOpen)
+{
+	bIsInventoryOpen = 	bIsOpen;
+
+	if(bIsInventoryOpen)
+	{
+		UE_LOG(LogTemp, Log,TEXT("Inventory Opened"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log,TEXT("Inventory Closed"));
+	}
+}
+
 /*
 void ATPSPlayer::AddItemToInventory(FItemData& item)
 {

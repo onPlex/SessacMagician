@@ -8,6 +8,7 @@
 #include "TPSPlayer.generated.h"
 
 
+
 class UInputMappingContext;
 class UInputAction;
 
@@ -64,13 +65,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* InteractionIA;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* InventoryIA;
+	
 	void Move(const FInputActionValue& Value);
 	void LookUp(const FInputActionValue& Value);
 	void Turn(const FInputActionValue& Value);
 	void InputJump(const FInputActionValue& Value);
 	void InputFire(const FInputActionValue& Value);
 	void InteractionPositive(const FInputActionValue& Value);
+	void ToggleInventory(const FInputActionValue& Value);
 
 private:
 	FVector MoveDircetion;
@@ -112,15 +116,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateMoney(int64 inputVal);
-/*
+
+
+protected:
+	bool bIsInventoryOpen = false;
+	class AUIManager* UIManagerRef;
 public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
-	TArray<FItemData> Inventory;
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddItemToInventory(FItemData& item);
-	
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void RemoveItemFromInventory(int32 ItemID);*/
+	UFUNCTION()
+	void HandleInventoryToggled(bool bIsOpen);	
 };
