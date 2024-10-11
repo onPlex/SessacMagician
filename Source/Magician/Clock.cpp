@@ -90,45 +90,33 @@ void AClock::RotateDirectionalLightWithTime(AActor* TargetActor)
 void AClock::UpdateSunColorByHourMinute(AActor* TargetActor)
 {
 	UDirectionalLightComponent* _DirectionalLightComp = Cast<ADirectionalLight>(TargetActor)->GetComponent();
-	FLinearColor InterpolationColor;
-	const float _LigthTime = CurrentHour * (CurrentMinute / 60);
 
-	if (_LigthTime > 0 && _LigthTime <= 3)
-	{
-		InterpolationColor = FLinearColor::LerpUsingHSV(Color24, Color3, _LigthTime / 3.0f);
-	}
-	else if (_LigthTime > 3 && _LigthTime <= 6)
-	{
-		InterpolationColor = FLinearColor::LerpUsingHSV(Color24, Color3, (_LigthTime - 3) / 3.0f);
-	}
-	else if (_LigthTime > 6 && _LigthTime <= 9)
-	{
-		InterpolationColor = FLinearColor::LerpUsingHSV(Color24, Color3, (_LigthTime - 6) / 3.0f);
-	}
-	else if (_LigthTime > 9 && _LigthTime <= 12)
-	{
-		InterpolationColor = FLinearColor::LerpUsingHSV(Color24, Color3, (_LigthTime - 9) / 3.0f);
-	}
-	else if (_LigthTime > 12 && _LigthTime <= 15)
-	{
-		InterpolationColor = FLinearColor::LerpUsingHSV(Color24, Color3, (_LigthTime - 12) / 3.0f);
-	}
-	else if (_LigthTime > 15 && _LigthTime <= 18)
-	{
-		InterpolationColor = FLinearColor::LerpUsingHSV(Color24, Color3, (_LigthTime - 15) / 3.0f);
-	}
-	else if (_LigthTime > 18 && _LigthTime <= 21)
-	{
-		InterpolationColor = FLinearColor::LerpUsingHSV(Color24, Color3, (_LigthTime - 18) / 3.0f);
-	}
-	else if (_LigthTime > 21 && _LigthTime <= 24)
-	{
-		InterpolationColor = FLinearColor::LerpUsingHSV(Color24, Color3, (_LigthTime - 21) / 3.0f);
-	}
-	else
-	{
-		InterpolationColor = FLinearColor::White;
-	}
+	float _LigthTime = CurrentHour + (CurrentMinute / 60);
 
-	_DirectionalLightComp->SetLightColor(InterpolationColor);
+	// 시간 값을 24시간 내로 보정 
+	_LigthTime = FMath::Fmod(_LigthTime, 24.0f);
+	float InterapolationFactor = (_LigthTime - (CurrentColorIndex * 3)) / 3.0f;
+
+	CurrentColorIndex = FMath::FloorToInt(_LigthTime/3.0f) % SunColors.Num();
+
+	if (CurrentColorIndex + 1 < SunColors.Num())
+	{
+		//시간에 따른 보간되는 색상 설정
+		FLinearColor InterpolationColor = FLinearColor::LerpUsingHSV
+		(
+		SunColors[CurrentColorIndex], SunColors[CurrentColorIndex + 1], InterapolationFactor
+		);
+
+		_DirectionalLightComp->SetLightColor(InterpolationColor);
+	}
+	else //마지막 컬러인경우 첫번째 컬러, 순환
+	{
+
+		FLinearColor InterpolationColor = FLinearColor::LerpUsingHSV
+		(
+			SunColors[CurrentColorIndex], SunColors[0], InterapolationFactor
+		);
+
+		_DirectionalLightComp->SetLightColor(InterpolationColor);
+	}
 }

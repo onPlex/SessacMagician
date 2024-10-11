@@ -49,22 +49,11 @@ public:
 	UPROPERTY(EditAnywhere,Category= "Sun")
 	class AActor* Sun;
 
-	UPROPERTY(EditAnywhere,Category= "Sun")
-    FLinearColor Color3;
-	UPROPERTY(EditAnywhere,Category= "Sun")
-	FLinearColor Color6;
-	UPROPERTY(EditAnywhere,Category= "Sun")
-	FLinearColor Color9;
-	UPROPERTY(EditAnywhere,Category= "Sun")
-	FLinearColor Color12;
-	UPROPERTY(EditAnywhere,Category= "Sun")
-	FLinearColor Color15;
-	UPROPERTY(EditAnywhere,Category= "Sun")
-	FLinearColor Color18;
-	UPROPERTY(EditAnywhere,Category= "Sun")
-	FLinearColor Color21;
-	UPROPERTY(EditAnywhere,Category= "Sun")
-	FLinearColor Color24;
+	UPROPERTY(EditAnywhere, Category = "Sun")
+    TArray<FLinearColor> SunColors;
+
+	//SunColors 에서 현재 사용할 Index
+	int32 CurrentColorIndex;
 	  
 protected:
 	void UpdateTime(float DeltaSec);
