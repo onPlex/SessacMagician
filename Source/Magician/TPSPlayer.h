@@ -33,12 +33,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
-	
 	// 생성된 인벤토리 컴포넌트의 레퍼런스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	class UInventoryActorComponent* DefaultInventory;
-	
-	
+
+
 	//Spring Arm 컴포넌트 생성
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* SpringArmComp;
@@ -67,6 +66,8 @@ protected:
 	UInputAction* FireIA;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* InteractionIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* InventoryIA;
 
 	void Move(const FInputActionValue& Value);
 	void LookUp(const FInputActionValue& Value);
@@ -74,6 +75,9 @@ protected:
 	void InputJump(const FInputActionValue& Value);
 	void InputFire(const FInputActionValue& Value);
 	void InteractionPositive(const FInputActionValue& Value);
+
+	
+
 
 private:
 	FVector MoveDircetion;
@@ -91,24 +95,21 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	UAnimMontage* AttackAnimMontage;
 
-
 private:
 	void PerformInteractionTrace(); // 상호작용 확인 Trace 
-	AActor* CachedInteractableActor;// 현재 상호작용 중인 액터를 저장
-	
+	AActor* CachedInteractableActor; // 현재 상호작용 중인 액터를 저장
+
 	bool FireReady;
-	float FireTimerTime;	
+	float FireTimerTime;
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Fire")
 	float FireCoolTime;
-	
 
 protected:
 	void FireCoolTimer(float Duration, float deltatTime);
 
-
 public:
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Status")
 	int64 CurrentMoney = 9999;
 
@@ -118,5 +119,4 @@ public:
 	//TArray<FItemData> Inventory;
 	//void AddItemToInventory(const FItemData& NewItem);
 	//void RemoveItemFromInventory(int32 ItemID);
-	
 };

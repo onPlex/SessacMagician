@@ -10,6 +10,7 @@
 #include "InteractableInterface.h"
 #include "PBullet.h"
 #include "InventoryActorComponent.h"
+#include "Blueprint/UserWidget.h"
 
 
 // Sets default values
@@ -99,7 +100,7 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(TurnIA, ETriggerEvent::Triggered, this, &ATPSPlayer::Turn);
 		EnhancedInputComponent->BindAction(JumpIA, ETriggerEvent::Started, this, &ATPSPlayer::InputJump);
 		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Triggered, this, &ATPSPlayer::InputFire);
-		EnhancedInputComponent->BindAction(InteractionIA, ETriggerEvent::Started, this, &ATPSPlayer::InteractionPositive);
+		EnhancedInputComponent->BindAction(InteractionIA, ETriggerEvent::Started, this, &ATPSPlayer::InteractionPositive);		
 	}
 }
 
@@ -177,6 +178,9 @@ void ATPSPlayer::InteractionPositive(const FInputActionValue& Value)
 		InteractableActor->Interact();
 	}
 }
+
+
+
 
 void ATPSPlayer::SpawnBullet()
 {

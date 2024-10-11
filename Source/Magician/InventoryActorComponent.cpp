@@ -75,6 +75,7 @@ void UInventoryActorComponent::AddItemToInventory(FName ItemRowName, int32 Quant
 			UE_LOG(LogTemp, Log, TEXT("Added new item with RowName %s, Quantity: %d"), *ItemRowName.ToString(), Quantity);
 		}
 	}
+	
 }
 
 void UInventoryActorComponent::RemoveItemFromInventory(FName ItemRowName, int32 Quantity)

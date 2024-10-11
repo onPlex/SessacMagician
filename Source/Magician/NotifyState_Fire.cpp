@@ -9,7 +9,7 @@ void UNotifyState_Fire::NotifyBegin(USkeletalMeshComponent* MeshComp,
 	float TotalDuration,
 	const FAnimNotifyEventReference& EventReference)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("NotifyBegin"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("NotifyBegin"));
 
 	TpsPlayer = Cast<ATPSPlayer>(MeshComp->GetOwner());
 
@@ -26,7 +26,7 @@ void UNotifyState_Fire::NotifyTick(USkeletalMeshComponent* MeshComp,
 	float FrameDeltaTime,
 	const FAnimNotifyEventReference& EventReference)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("NotifyTick"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("NotifyTick"));
 }
 
 void  UNotifyState_Fire::NotifyEnd(USkeletalMeshComponent* MeshComp,
@@ -34,5 +34,5 @@ void  UNotifyState_Fire::NotifyEnd(USkeletalMeshComponent* MeshComp,
 	const FAnimNotifyEventReference& EventReference
 )
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("NotifyEnd"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("NotifyEnd"));
 }
