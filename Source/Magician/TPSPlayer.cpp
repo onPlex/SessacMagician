@@ -366,14 +366,11 @@ void ATPSPlayer::UpdateMoney(int64 inputVal)
 
 void ATPSPlayer::ToggleInventory(const FInputActionValue& Value)
 {
-	if(UIManagerRef)
-	{
-		if(UIManagerRef->InventoryWidget)
+		if(UIManagerRef &&UIManagerRef->InventoryWidget)
 		{
+			UIManagerRef->InventoryWidget->SetInventoryItems(DefaultInventory);
 			UIManagerRef->InventoryWidget->ToggleInventory();
 		}
-	}
-	
 }
 void ATPSPlayer::HandleInventoryToggled(bool bIsOpen)
 {
